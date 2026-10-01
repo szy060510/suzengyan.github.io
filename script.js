@@ -513,6 +513,11 @@ SECTIONS.forEach(function (item) {
         return;
     }
 
+    const tags = item.sel === "#sectionAbout"
+        ? Array.from(section.querySelectorAll(".tags li"))
+        : [];
+    if (tags.length) gsap.set(tags, { autoAlpha: 0, y: 12 });
+
     let paragraphIndex = 0;
     let characterIndex = 0;
     let typingComplete = false;
@@ -526,6 +531,7 @@ SECTIONS.forEach(function (item) {
     }
 
     function finishTyping() {
+        if (typingComplete) return;
         typingComplete = true;
         if (typingTimer !== null) {
             window.clearTimeout(typingTimer);
@@ -538,6 +544,15 @@ SECTIONS.forEach(function (item) {
                 character.classList.remove("is-current");
             });
         });
+        if (tags.length) {
+            gsap.to(tags, {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.45,
+                stagger: 0.12,
+                ease: "power2.out"
+            });
+        }
     }
 
     function typeNextCharacter() {
