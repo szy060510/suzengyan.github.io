@@ -406,6 +406,29 @@ const SECTIONS = [
     { sel: "#sectionLabs",   top: 3000 },
     { sel: "#sectionThanks", top: 4500 }
 ];
+const MOBILE_AUTO_ADVANCE_DELAY = 2500;
+let mobileAutoAdvanceTimer = null;
+
+function cancelMobileAutoAdvance() {
+    if (mobileAutoAdvanceTimer === null) return;
+    window.clearTimeout(mobileAutoAdvanceTimer);
+    mobileAutoAdvanceTimer = null;
+}
+
+function scheduleMobileAutoAdvance(index) {
+    cancelMobileAutoAdvance();
+    if (!window.matchMedia("(max-width: 760px)").matches
+        || window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        || index >= SECTIONS.length - 1) return;
+
+    mobileAutoAdvanceTimer = window.setTimeout(function () {
+        mobileAutoAdvanceTimer = null;
+        if (currentSectionIndex() === index) goToSection(index + 1);
+    }, MOBILE_AUTO_ADVANCE_DELAY);
+}
+
+window.addEventListener("touchstart", cancelMobileAutoAdvance, { passive: true });
+window.addEventListener("wheel", cancelMobileAutoAdvance, { passive: true });
 
 const coverNameChars = Array.from(document.querySelectorAll(".cover-name__char"));
 const coverDroneChars = Array.from(document.querySelectorAll(".cover-sub__char"));
@@ -449,7 +472,9 @@ function startCoverTyping() {
 
     revealCoverCharacters(coverNameChars, 1000, function () {
         scheduleCoverTyping(function () {
-            revealCoverCharacters(coverDroneChars, 500);
+            revealCoverCharacters(coverDroneChars, 500, function () {
+                scheduleMobileAutoAdvance(0);
+            });
         }, 500);
     });
 }
@@ -516,6 +541,9 @@ SECTIONS.forEach(function (item) {
         : [];
     if (tags.length) gsap.set(tags, { autoAlpha: 0, y: 12 });
 
+    const sectionIndex = SECTIONS.findIndex(function (entry) {
+        return entry.sel === item.sel;
+    });
     let paragraphIndex = 0;
     let characterIndex = 0;
     let typingComplete = false;
@@ -529,6 +557,7 @@ SECTIONS.forEach(function (item) {
 
         const panel = character.closest(".panel");
         if (!panel) return;
+
         const panelRect = panel.getBoundingClientRect();
         const characterRect = character.getBoundingClientRect();
         cursorFollowPanel = panel;
@@ -585,6 +614,7 @@ SECTIONS.forEach(function (item) {
                 ease: "power2.out"
             });
         }
+        scheduleMobileAutoAdvance(sectionIndex);
     }
 
     function typeNextCharacter() {
@@ -710,6 +740,7 @@ function currentSectionIndex() {
 // 跳到第 i 屏（正好停在那一屏内容居中处）
 function goToSection(i) {
     if (i < 0 || i >= SECTIONS.length) return;
+    cancelMobileAutoAdvance();
     window.scrollTo({ top: SECTIONS[i].top, behavior: "smooth" });
 }
 
