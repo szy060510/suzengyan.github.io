@@ -234,7 +234,6 @@ fstarTL.to("#fstar", { x: -700, y: -250, ease: "power2.out" }, 0);
 const eggHint = document.getElementById("eggHint");
 const eggBurst = document.getElementById("eggBurst");
 const fstar = document.getElementById("fstar");
-const eggClose = document.querySelector(".egg-close");
 if (fstar && eggHint && eggBurst) {
     fstar.style.cursor = "pointer";
     fstar.style.pointerEvents = "auto";
@@ -292,7 +291,7 @@ if (fstar && eggHint && eggBurst) {
         travelY *= travelScale;
         const colors = ["#fff0b3", "#ffc4d5", "#d7f8ff", "#ffffff"];
 
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 80; i++) {
             const meteor = document.createElement("span");
             const duration = 1.7 + Math.random() * 0.8;
             const delay = Math.random() * 2.8;
@@ -349,15 +348,13 @@ if (fstar && eggHint && eggBurst) {
         if (inside) triggerEgg();
     }
 
-    if (eggClose) {
-        eggClose.addEventListener("click", function () {
-            eggHint.classList.remove("show");
-            eggTriggered = false;
-            fstar.style.opacity = "1";
-            fstar.style.transform = "";
-            fstar.style.pointerEvents = "auto";
-        });
-    }
+    eggHint.addEventListener("click", function () {
+        eggTriggered = false;
+        fstar.style.opacity = "1";
+        fstar.style.transform = "";
+        fstar.style.pointerEvents = "auto";
+        launchMeteorShower(window.innerWidth / 2, window.innerHeight / 2);
+    });
 
     fstar.addEventListener("click", triggerEgg);
     document.addEventListener("pointerdown", checkStarPointer);
@@ -411,6 +408,194 @@ const SECTIONS = [
     { sel: "#sectionLabs",   top: 3000 },
     { sel: "#sectionThanks", top: 4500 }
 ];
+
+const coverNameChars = Array.from(document.querySelectorAll(".cover-name__char"));
+const coverDroneChars = Array.from(document.querySelectorAll(".cover-sub__char"));
+const coverTypingTimers = new Set();
+let coverTypingStarted = false;
+let coverTypingFinished = false;
+
+function scheduleCoverTyping(callback, delay) {
+    const timer = window.setTimeout(function () {
+        coverTypingTimers.delete(timer);
+        if (!coverTypingFinished) callback();
+    }, delay);
+    coverTypingTimers.add(timer);
+}
+
+function finishCoverTyping() {
+    if (!coverTypingStarted || coverTypingFinished) return;
+    coverTypingFinished = true;
+    coverTypingTimers.forEach(window.clearTimeout);
+    coverTypingTimers.clear();
+    coverNameChars.concat(coverDroneChars).forEach(function (character) {
+        character.classList.add("is-visible");
+    });
+}
+
+function revealCoverCharacters(characters, interval, onComplete) {
+    characters.forEach(function (character, index) {
+        scheduleCoverTyping(function () {
+            character.classList.add("is-visible");
+            if (index === characters.length - 1 && onComplete) onComplete();
+        }, index * interval);
+    });
+}
+
+function startCoverTyping() {
+    coverTypingStarted = true;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        finishCoverTyping();
+        return;
+    }
+
+    revealCoverCharacters(coverNameChars, 1000, function () {
+        scheduleCoverTyping(function () {
+            revealCoverCharacters(coverDroneChars, 500);
+        }, 500);
+    });
+}
+
+if (document.getElementById("entryLoader")) {
+    window.addEventListener("entryloadercomplete", startCoverTyping, { once: true });
+} else {
+    startCoverTyping();
+}
+
+const TYPEWRITER_CHAR_DELAY = 35;
+const TYPEWRITER_PAUSE = 300;
+const TYPEWRITER_PUNCTUATION = /[，。！？；：、,.!?;:…]/u;
+const finishSectionTyping = new Map();
+
+SECTIONS.forEach(function (item) {
+    const section = document.querySelector(item.sel);
+    if (!section) return;
+
+    const paragraphs = Array.from(section.querySelectorAll(".text-block p"));
+    if (!paragraphs.length) return;
+
+    const textRuns = paragraphs.map(function (paragraph) {
+        const text = paragraph.textContent;
+        const breakBefore = paragraph.dataset.breakBefore;
+        const breakAt = breakBefore ? text.indexOf(breakBefore) : -1;
+        const breakIndex = breakAt < 0 ? -1 : Array.from(text.slice(0, breakAt)).length;
+        paragraph.setAttribute("aria-label", text);
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            if (breakAt >= 0) {
+                paragraph.replaceChildren(
+                    document.createTextNode(text.slice(0, breakAt)),
+                    document.createElement("br"),
+                    document.createTextNode(text.slice(breakAt))
+                );
+            }
+            return { paragraph, characters: [] };
+        }
+
+        const fragment = document.createDocumentFragment();
+        const characters = Array.from(text).map(function (character, index) {
+            if (index === breakIndex) fragment.appendChild(document.createElement("br"));
+
+            const span = document.createElement("span");
+            span.className = "typewriter-char";
+            span.setAttribute("aria-hidden", "true");
+            span.textContent = character;
+            fragment.appendChild(span);
+            return span;
+        });
+
+        paragraph.replaceChildren(fragment);
+        return { paragraph, characters };
+    });
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        finishSectionTyping.set(item.sel, function () {});
+        return;
+    }
+
+    let paragraphIndex = 0;
+    let characterIndex = 0;
+    let typingComplete = false;
+    let typingTimer = null;
+
+    function scheduleNextCharacter(delay) {
+        typingTimer = window.setTimeout(function () {
+            typingTimer = null;
+            typeNextCharacter();
+        }, delay);
+    }
+
+    function finishTyping() {
+        typingComplete = true;
+        if (typingTimer !== null) {
+            window.clearTimeout(typingTimer);
+            typingTimer = null;
+        }
+        textRuns.forEach(function (run) {
+            run.paragraph.classList.remove("is-typing");
+            run.characters.forEach(function (character) {
+                character.classList.add("is-visible");
+                character.classList.remove("is-current");
+            });
+        });
+    }
+
+    function typeNextCharacter() {
+        if (typingComplete) return;
+
+        const current = textRuns[paragraphIndex];
+        if (!current) {
+            finishTyping();
+            return;
+        }
+
+        const character = current.characters[characterIndex];
+        if (!character) {
+            paragraphIndex += 1;
+            characterIndex = 0;
+            if (paragraphIndex < textRuns.length) {
+                scheduleNextCharacter(TYPEWRITER_PAUSE);
+            } else {
+                finishTyping();
+            }
+            return;
+        }
+
+        if (characterIndex === 0) current.paragraph.classList.add("is-typing");
+        current.paragraph.querySelector(".is-current")?.classList.remove("is-current");
+        character.classList.add("is-visible", "is-current");
+        characterIndex += 1;
+
+        if (characterIndex < current.characters.length) {
+            const delay = TYPEWRITER_PUNCTUATION.test(character.textContent)
+                ? TYPEWRITER_PAUSE
+                : TYPEWRITER_CHAR_DELAY;
+            scheduleNextCharacter(delay);
+            return;
+        }
+
+        current.paragraph.classList.remove("is-typing");
+        character.classList.remove("is-current");
+        paragraphIndex += 1;
+        characterIndex = 0;
+        if (paragraphIndex < textRuns.length) {
+            scheduleNextCharacter(TYPEWRITER_PAUSE);
+        } else {
+            finishTyping();
+        }
+    }
+
+    finishSectionTyping.set(item.sel, finishTyping);
+
+    ScrollTrigger.create({
+        trigger: section,
+        start: "top center",
+        once: true,
+        onEnter: function () {
+            typeNextCharacter();
+        }
+    });
+});
 
 // 第 i 屏与下一屏的交接点（滚动位置）
 function crossPoint(i) {
@@ -480,6 +665,14 @@ function goToSection(i) {
     window.scrollTo({ top: SECTIONS[i].top, behavior: "smooth" });
 }
 
+function finishPageTyping(index) {
+    const section = SECTIONS[index];
+    if (!section) return;
+
+    if (section.sel === "#sectionCover") finishCoverTyping();
+    finishSectionTyping.get(section.sel)?.();
+}
+
 function syncControls() {
     const idx = currentSectionIndex();
 
@@ -505,7 +698,13 @@ navDots.forEach(function (dot, i) {
 arrowBtns.forEach(function (btn) {
     btn.addEventListener("click", function () {
         const dir = parseInt(btn.getAttribute("data-dir"), 10) || 0;
-        goToSection(currentSectionIndex() + dir);
+        const currentIndex = currentSectionIndex();
+        const targetIndex = currentIndex + dir;
+        if (targetIndex < 0 || targetIndex >= SECTIONS.length) return;
+
+        // 只跳过当前页面的打字动画，目标页保留正常进入动画
+        finishPageTyping(currentIndex);
+        goToSection(targetIndex);
     });
 });
 
@@ -513,10 +712,16 @@ arrowBtns.forEach(function (btn) {
 window.addEventListener("keydown", function (e) {
     if (e.key === "ArrowDown" || e.key === "PageDown") {
         e.preventDefault();
-        goToSection(currentSectionIndex() + 1);
+        const idx = currentSectionIndex();
+        if (idx >= SECTIONS.length - 1) return;
+        finishPageTyping(idx);
+        goToSection(idx + 1);
     } else if (e.key === "ArrowUp" || e.key === "PageUp") {
         e.preventDefault();
-        goToSection(currentSectionIndex() - 1);
+        const idx = currentSectionIndex();
+        if (idx <= 0) return;
+        finishPageTyping(idx);
+        goToSection(idx - 1);
     }
 });
 

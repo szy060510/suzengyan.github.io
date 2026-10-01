@@ -409,8 +409,8 @@
         <div class="pin">
             <div class="panel panel-cover">
                 <p class="eyebrow">PERSONAL PORTFOLIO</p>
-                <h1 class="cover-name">苏增研</h1>
-                <p class="cover-sub">我的目标实验室是：无人机</p>
+                <h1 class="cover-name"><span class="cover-name__word"><span class="cover-name__prefix">我叫</span><span class="cover-name__char">苏</span><span class="cover-name__char">增</span><span class="cover-name__char">研</span></span></h1>
+                <p class="cover-sub">我的目标实验室是：<mark><strong><span class="cover-sub__char">无</span><span class="cover-sub__char">人</span><span class="cover-sub__char">机</span></strong></mark></p>
             </div>
         </div>
     </section>
@@ -421,13 +421,28 @@
             <div class="panel">
                 <p class="eyebrow">01 / ABOUT ME</p>
                 <h2 class="title">自我介绍</h2>
-                <p class="body">
-                    <li>性格开朗，社交方面比较平易近人，跟任何人都能0障碍交流（我会的语言）</li>
-                    <li>最早接触编程是小学时候玩scratch，那时候很热衷于做游戏，特别是对于npc的ai的调试</li>
-                    <li>自学能力较强，在编程上有一定基础，python接触较多，C与C++语言目前在学</li>
-                    <li>个人特点是对自己要求高,希望高效精确完成任务，时间观念较强</li>
-                    <li>ps:喜欢整块的时间，学习和玩不喜欢穿插，爱好是打游戏</li>
-                </p>
+                <div class="text-blocks body">
+                    <article class="text-block">
+                        <h3 class="text-block__title"><mark>为人处世</mark></h3>
+                        <p>性格开朗，社交方面比较平易近人，跟任何人都能0障碍交流（我会的语言）</p>
+                    </article>
+                    <article class="text-block">
+                        <h3 class="text-block__title"><mark>我与编程</mark></h3>
+                        <p data-break-before="特别">最早接触编程是小学时候玩scratch，那时候很热衷于做游戏，特别是对于npc的ai的调试</p>
+                    </article>
+                    <article class="text-block">
+                        <h3 class="text-block__title"><mark>目前</mark></h3>
+                        <p>自学能力强，在编程上有一定基础，python接触较多，C与C++语言目前在学</p>
+                    </article>
+                    <article class="text-block">
+                        <h3 class="text-block__title"><mark>个人特点</mark></h3>
+                        <p>对自己要求高,希望高效精确完成任务，时间观念较强</p>
+                    </article>
+                    <article class="text-block">
+                        <h3 class="text-block__title"><mark>PS:</mark></h3>
+                        <p>喜欢整块的时间，学习和玩不喜欢穿插，爱好是打游戏</p>
+                    </article>
+                </div>
                 <ul class="tags">
                     <li>苏增研</li>
                     <li>人工智能一班</li>
@@ -444,10 +459,19 @@
             <div class="panel panel-wide">
                 <p class="eyebrow">02 / RESEARCH INTERESTS</p>
                 <h2 class="title">无人机实验室</h2>
-                <div class="body">
-                    <p>对于无人机实验室的理解就是要在编程中融合统筹规划最佳路线的算法，我玩游戏都喜欢追求最优解，对于在编程中寻找最优也是我感兴趣的方向</p>
-                    <p>其次无人机作为未来最新兴的低空经济，具有广阔的发展前景和应用潜力，我认为提前接触无人机方面的编程技术对于自我提升是有很大帮助的</p>
-                    <p>快速高效精确是我追求的目标，我觉得无人机实验室是一个符合我兴趣和发展的很好选择</p>
+                <div class="text-blocks body">
+                    <article class="text-block">
+                        <h3 class="text-block__title"><mark>对实验室的理解</mark></h3>
+                        <p data-break-before="我玩游戏">对于无人机实验室的理解就是要在编程中融合统筹规划最佳路线的算法，我玩游戏都喜欢追求最优解，对于在编程中寻找最优也是我感兴趣的方向</p>
+                    </article>
+                    <article class="text-block">
+                        <h3 class="text-block__title"><mark>为什么选择</mark></h3>
+                        <p data-break-before="我认为">其次无人机作为未来最新兴的低空经济，具有广阔的发展前景和应用潜力，我认为提前接触无人机方面的编程技术对于自我提升是有很大帮助的</p>
+                    </article>
+                    <article class="text-block">
+                        <h3 class="text-block__title"><mark>与个人目标的契合度</mark></h3>
+                        <p>快速高效精确是我追求的目标，我觉得无人机实验室是一个符合我兴趣和发展的很好选择</p>
+                    </article>
                 </div>
             </div>
         </div>
@@ -488,10 +512,7 @@
     <button class="arrow-btn" data-dir="1" type="button" aria-label="下一屏">&#9660;</button>
 </div>
 
-<div id="eggHint" class="egg-hint" aria-live="polite">
-    <button type="button" class="egg-close" aria-label="关闭彩蛋提示">×</button>
-    <span>我是彩蛋（懒完了）</span>
-</div>
+<button id="eggHint" class="egg-hint" type="button" aria-label="再次触发流星雨">我是彩蛋（懒完了）</button>
 <div id="eggBurst" class="egg-burst" aria-hidden="true"></div>
 <!-- <a class="btn" id="fullscr">Go Fullscreen</a> -->
 <script>
@@ -517,6 +538,7 @@
             entryLoader.classList.add("is-hidden");
             window.setTimeout(function () {
                 entryLoader.remove();
+                window.dispatchEvent(new Event("entryloadercomplete"));
             }, 600);
         }
 

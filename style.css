@@ -1,8 +1,29 @@
+html {
+    overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
 body {
     margin: 0;
     padding: 0;
     font-family: "Canva Sans", Arial, Helvetica, sans-serif;
     background: #1b1734;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
 }
 
 .entry-loader {
@@ -104,7 +125,7 @@ body {
 
 .entry-loader__label {
     margin: 0 0 20px;
-    font-size: 24px;
+    font-size: 25px;
     font-weight: 300;
     letter-spacing: 8px;
     text-transform: uppercase;
@@ -130,7 +151,7 @@ body {
 .entry-loader__percentage {
     margin: 15px 0 0;
     color: rgba(255, 255, 255, 0.72);
-    font-size: 14px;
+    font-size: 15px;
     font-variant-numeric: tabular-nums;
 }
 
@@ -155,7 +176,7 @@ body {
 
 @media (max-width: 480px) {
     .entry-loader__visual { width: 120px; height: 120px; }
-    .entry-loader__label { font-size: 18px; letter-spacing: 4px; }
+    .entry-loader__label { font-size: 19px; letter-spacing: 4px; }
     .entry-loader__track { width: 150px; }
 }
 
@@ -199,7 +220,7 @@ svg {
     transform: translateX(-50%);
     border: 1px solid #fff;
     border-radius: 5px;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     padding: 0.5rem 0.7em;
     background-color: transparent;
     color: #ffffff;
@@ -268,6 +289,8 @@ html.anim .pin { opacity: 0; }
     box-sizing: border-box;
     max-height: 78vh;
     overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     padding: 56px clamp(32px, 5vw, 72px);
     border-radius: 20px;
     text-align: center;
@@ -279,11 +302,15 @@ html.anim .pin { opacity: 0; }
     box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
 }
 
+.sec .panel::-webkit-scrollbar {
+    display: none;
+}
+
 .panel-wide { width: min(980px, 92vw); }
 
 .eyebrow {
     margin: 0 0 14px;
-    font-size: 0.72rem;
+    font-size: 0.76rem;
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: #ffd9a6;
@@ -292,20 +319,83 @@ html.anim .pin { opacity: 0; }
 
 .title {
     margin: 0 0 18px;
-    font-size: clamp(1.9rem, 4vw, 2.8rem);
+    font-size: clamp(2rem, 4.2vw, 2.95rem);
     font-weight: 700;
     letter-spacing: 0.06em;
 }
 
 .body {
     margin: 0;
-    font-size: clamp(1.08rem, 2.2vw, 1.25rem);
+    font-size: clamp(1.15rem, 2.3vw, 1.35rem);
     line-height: 1.9;
     color: rgba(247, 242, 239, 0.88);
 }
 
+.text-blocks {
+    display: grid;
+    gap: 12px;
+    margin-top: 24px;
+    text-align: left;
+}
+
+.text-block {
+    padding: 14px 18px;
+    border-left: 3px solid #ffd9a6;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.text-block__title {
+    min-height: 1.4em;
+    margin: 0 0 6px;
+    color: #ffd9a6;
+    font-size: 1.5rem;
+    line-height: 1.4;
+}
+
+.text-block__title mark {
+    color: inherit;
+    background: rgba(22, 18, 40, 0.55);
+    border-radius: 3px;
+    padding: 0.06em 0.24em;
+}
+
+.text-block p {
+    margin: 0;
+    font-size: clamp(1.2rem, 2.15vw, 1.35rem);
+    line-height: 1.75;
+    color: rgba(247, 242, 239, 0.9);
+}
+
+.typewriter-char {
+    opacity: 0;
+}
+
+.typewriter-char.is-visible {
+    opacity: 1;
+}
+
+.typewriter-char.is-current {
+    position: relative;
+}
+
+.typewriter-char.is-current::after {
+    position: absolute;
+    top: 0.08em;
+    right: -0.12em;
+    width: 1px;
+    height: 0.9em;
+    background: currentColor;
+    content: "";
+    animation: typewriter-caret 0.6s steps(1, end) infinite;
+}
+
+@keyframes typewriter-caret {
+    50% { opacity: 0; }
+}
+
 .sec .panel > li {
-    font-size: clamp(1.08rem, 2.2vw, 1.25rem);
+    font-size: clamp(1.13rem, 2.3vw, 1.31rem);
     line-height: 1.9;
 }
 
@@ -322,24 +412,58 @@ html.anim .pin { opacity: 0; }
 
 .cover-name {
     margin: 0 0 10px;
-    font-size: clamp(2.4rem, 8vw, 4.6rem);
+    font-size: clamp(3rem, 10vw, 6rem);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-shadow: 0 4px 30px rgba(0, 0, 0, 0.45);
 }
 
+.cover-name__word {
+    position: relative;
+    display: inline-block;
+}
+
+.cover-name__prefix {
+    position: absolute;
+    top: 50%;
+    right: calc(100% + 0.3em);
+    font-size: clamp(1rem, 2.5vw, 1.31rem);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    transform: translateY(-50%);
+}
+
+.cover-name__char,
+.cover-sub__char {
+    opacity: 0;
+    transition: opacity 0.12s linear;
+}
+
+.cover-name__char.is-visible,
+.cover-sub__char.is-visible {
+    opacity: 1;
+}
+
 .cover-sub {
     margin: 0;
-    font-size: clamp(0.95rem, 2.4vw, 1.25rem);
+    font-size: clamp(1rem, 2.5vw, 1.31rem);
     letter-spacing: 0.16em;
     color: rgba(255, 255, 255, 0.92);
     text-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
 }
 
+.cover-sub mark {
+    color: inherit;
+    background: rgba(22, 18, 40, 0.55);
+    border-radius: 3px;
+    padding: 0.06em 0.24em;
+}
+
 .scroll-hint {
     display: inline-block;
     margin-top: 46px;
-    font-size: 0.75rem;
+    font-size: 0.79rem;
     letter-spacing: 0.3em;
     color: rgba(255, 255, 255, 0.78);
     animation: hintFloat 1.8s ease-in-out infinite;
@@ -364,7 +488,7 @@ html.anim .pin { opacity: 0; }
 .tags li {
     padding: 8px 18px;
     border-radius: 999px;
-    font-size: 0.95rem;
+    font-size: 1rem;
     letter-spacing: 0.05em;
     background: rgba(255, 255, 255, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.22);
@@ -394,20 +518,20 @@ html.anim .pin { opacity: 0; }
 
 .card-num {
     display: inline-block;
-    font-size: 0.75rem;
+    font-size: 0.79rem;
     letter-spacing: 0.2em;
     color: #ffd9a6;
 }
 
 .card h3 {
     margin: 10px 0 8px;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     letter-spacing: 0.04em;
 }
 
 .card p {
     margin: 0;
-    font-size: 0.86rem;
+    font-size: 0.9rem;
     line-height: 1.8;
     color: rgba(247, 242, 239, 0.82);
 }
@@ -423,7 +547,7 @@ html.anim .pin { opacity: 0; }
 
 .thanks-title {
     margin: 0 0 18px;
-    font-size: clamp(2.4rem, 7vw, 4.2rem);
+    font-size: clamp(2.52rem, 7.35vw, 4.4rem);
     font-weight: 700;
     letter-spacing: 0.14em;
     text-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
@@ -480,7 +604,7 @@ html.anim .pin { opacity: 0; }
     background: rgba(255, 244, 200, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: #fff5de;
-    font-size: 1.15rem;
+    font-size: 1.21rem;
     letter-spacing: 0.08em;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -491,8 +615,13 @@ html.anim .pin { opacity: 0; }
     z-index: 20;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     min-width: 240px;
+    font-family: inherit;
+    text-align: center;
+    cursor: pointer;
+    appearance: none;
 }
 
 .egg-hint.show {
@@ -501,26 +630,13 @@ html.anim .pin { opacity: 0; }
     pointer-events: auto;
 }
 
-.egg-close {
-    width: 20px;
-    height: 20px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-    font-size: 18px;
-    line-height: 1;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    transition: background 0.2s ease, transform 0.2s ease;
+.egg-hint:hover {
+    background: rgba(255, 244, 200, 0.3);
 }
 
-.egg-close:hover {
-    background: rgba(255, 255, 255, 0.22);
-    transform: scale(1.08);
+.egg-hint:focus-visible {
+    outline: 2px solid #fff5de;
+    outline-offset: 3px;
 }
 
 .egg-burst {
@@ -744,7 +860,7 @@ html.anim .pin { opacity: 0; }
 
 @media (max-width: 760px) {
     #sectionNav { right: 10px; gap: 10px; }
-    .nav-dot { width: 26px; height: 26px; font-size: 11px; }
+    .nav-dot { width: 26px; height: 26px; font-size: 12px; }
 }
 
 /* ================= 左侧快速翻页方向键 ================= */
@@ -768,7 +884,7 @@ html.anim .pin { opacity: 0; }
     border: 1px solid rgba(255, 255, 255, 0.45);
     background: rgba(20, 16, 38, 0.35);
     color: rgba(255, 255, 255, 0.85);
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1;
     cursor: pointer;
     transition: all 0.25s ease;
