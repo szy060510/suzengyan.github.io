@@ -290,22 +290,17 @@ if (fstar && eggHint && eggBurst) {
         const travelScale = Math.max(1, (window.innerWidth + 200) / Math.abs(travelX));
         travelX *= travelScale;
         travelY *= travelScale;
-        const distance = Math.hypot(travelX, travelY);
-        const perpendicularX = -travelY / distance;
-        const perpendicularY = travelX / distance;
-        const laneSpacing = Math.min(36, Math.max(24, window.innerHeight / 28));
-        const startY = Math.min(y - 120, window.innerHeight * 0.36);
         const colors = ["#fff0b3", "#ffc4d5", "#d7f8ff", "#ffffff"];
 
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 40; i++) {
             const meteor = document.createElement("span");
-            const lane = (i - 9.5) * laneSpacing;
-            const duration = 1.7 + Math.random() * 0.45;
-            const delay = i * 0.035;
+            const duration = 1.7 + Math.random() * 0.8;
+            const delay = Math.random() * 2.8;
+            const startY = window.innerHeight * (0.08 + Math.random() * 0.68);
 
             meteor.className = "shower-meteor";
-            meteor.style.left = (window.innerWidth + 80 + Math.random() * 100 + perpendicularX * lane) + "px";
-            meteor.style.top = (startY + perpendicularY * lane) + "px";
+            meteor.style.left = (window.innerWidth + 60 + Math.random() * 180) + "px";
+            meteor.style.top = startY + "px";
             meteor.style.setProperty("--angle", Math.atan2(travelY, travelX) + "rad");
             meteor.style.setProperty("--travel-x", travelX + "px");
             meteor.style.setProperty("--travel-y", travelY + "px");
