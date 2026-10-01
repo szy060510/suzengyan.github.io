@@ -1,5 +1,3 @@
-//More info about this project and the newer optimized version: https://isladjan.com/work/4/
-//Author: isladjan - https://isladjan.com/
 
 gsap.registerPlugin(ScrollTrigger);
 
