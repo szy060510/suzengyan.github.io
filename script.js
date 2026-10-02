@@ -413,8 +413,7 @@ const SECTIONS = [
 ];
 const MOBILE_AUTO_ADVANCE_DELAY = 2500;
 let mobileAutoAdvanceTimer = null;
-let cursorFollowEnabled = true;
-const cancelCursorFollowCallbacks = new Set();
+const cancelCursorFollowCallbacks = new Map();
 
 function cancelMobileAutoAdvance() {
     if (mobileAutoAdvanceTimer === null) return;
@@ -436,10 +435,8 @@ function scheduleMobileAutoAdvance(index) {
 
 window.addEventListener("touchstart", function () {
     cancelMobileAutoAdvance();
-    cursorFollowEnabled = false;
-    cancelCursorFollowCallbacks.forEach(function (cancel) {
-        cancel();
-    });
+    const activeSectionIndex = currentSectionIndex();
+    cancelCursorFollowCallbacks.get(activeSectionIndex)?.();
 }, { passive: true });
 window.addEventListener("wheel", cancelMobileAutoAdvance, { passive: true });
 
@@ -564,8 +561,10 @@ SECTIONS.forEach(function (item) {
     let cursorFollowFrame = null;
     let cursorFollowPanel = null;
     let cursorFollowTarget = 0;
+    let cursorFollowEnabled = true;
 
-    cancelCursorFollowCallbacks.add(function () {
+    cancelCursorFollowCallbacks.set(sectionIndex, function () {
+        cursorFollowEnabled = false;
         if (cursorFollowFrame === null) return;
         window.cancelAnimationFrame(cursorFollowFrame);
         cursorFollowFrame = null;
