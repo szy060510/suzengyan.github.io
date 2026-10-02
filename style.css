@@ -867,20 +867,20 @@ html.anim .pin { opacity: 0; }
 
 #pageArrows {
     position: fixed;
-    left: 22px;
-    top: 50%;
-    transform: translateY(-50%);
+    inset: 12px 16px;
     z-index: 12;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
 }
 
 .arrow-btn {
-    width: 42px;
+    width: min(560px, 100%);
     height: 42px;
     padding: 0;
-    border-radius: 12px;
+    border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.45);
     background: rgba(20, 16, 38, 0.35);
     color: rgba(255, 255, 255, 0.85);
@@ -888,6 +888,7 @@ html.anim .pin { opacity: 0; }
     line-height: 1;
     cursor: pointer;
     transition: all 0.25s ease;
+    pointer-events: auto;
 }
 
 .arrow-btn:hover:not(:disabled) {
@@ -903,6 +904,6 @@ html.anim .pin { opacity: 0; }
 }
 
 @media (max-width: 760px) {
-    #pageArrows { left: 10px; gap: 8px; }
-    .arrow-btn { width: 36px; height: 36px; border-radius: 10px; }
+    #pageArrows { inset: 10px 12px; }
+    .arrow-btn { height: 38px; }
 }
