@@ -891,11 +891,13 @@ html.anim .pin { opacity: 0; }
     pointer-events: auto;
 }
 
-.arrow-btn:hover:not(:disabled) {
-    background: #ffd9a6;
-    border-color: #ffd9a6;
-    color: #1b1734;
-    transform: scale(1.08);
+@media (hover: hover) and (pointer: fine) {
+    .arrow-btn:hover:not(:disabled) {
+        background: #ffd9a6;
+        border-color: #ffd9a6;
+        color: #1b1734;
+        transform: scale(1.08);
+    }
 }
 
 .arrow-btn:disabled {
