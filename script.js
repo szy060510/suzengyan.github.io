@@ -1,5 +1,3 @@
-//More info about this project and the newer optimized version: https://isladjan.com/work/4/
-//Author: isladjan - https://isladjan.com/
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -238,6 +236,7 @@ if (fstar && eggHint && eggBurst) {
     fstar.style.cursor = "pointer";
     fstar.style.pointerEvents = "auto";
     let eggTriggered = false;
+    let eggHintLastClickAt = -Infinity;
 
     function burstAt(x, y) {
         const impact = document.createElement("span");
@@ -349,6 +348,10 @@ if (fstar && eggHint && eggBurst) {
     }
 
     eggHint.addEventListener("click", function () {
+        const now = Date.now();
+        if (now - eggHintLastClickAt < 2000) return;
+        eggHintLastClickAt = now;
+
         eggTriggered = false;
         fstar.style.opacity = "1";
         fstar.style.transform = "";
@@ -533,10 +536,10 @@ SECTIONS.forEach(function (item) {
     let characterIndex = 0;
     let typingComplete = false;
     let typingTimer = null;
-    let cursorFollowEnabled = true;
     let cursorFollowFrame = null;
     let cursorFollowPanel = null;
     let cursorFollowTarget = 0;
+    let cursorFollowEnabled = true;
 
     cancelCursorFollowCallbacks.set(sectionIndex, function () {
         cursorFollowEnabled = false;
