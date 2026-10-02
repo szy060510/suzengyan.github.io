@@ -1,3 +1,5 @@
+//More info about this project and the newer optimized version: https://isladjan.com/work/4/
+//Author: isladjan - https://isladjan.com/
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -236,7 +238,6 @@ if (fstar && eggHint && eggBurst) {
     fstar.style.cursor = "pointer";
     fstar.style.pointerEvents = "auto";
     let eggTriggered = false;
-    let eggHintLastClickAt = -Infinity;
 
     function burstAt(x, y) {
         const impact = document.createElement("span");
@@ -348,10 +349,6 @@ if (fstar && eggHint && eggBurst) {
     }
 
     eggHint.addEventListener("click", function () {
-        const now = Date.now();
-        if (now - eggHintLastClickAt < 2000) return;
-        eggHintLastClickAt = now;
-
         eggTriggered = false;
         fstar.style.opacity = "1";
         fstar.style.transform = "";
@@ -411,14 +408,6 @@ const SECTIONS = [
     { sel: "#sectionLabs",   top: 3000 },
     { sel: "#sectionThanks", top: 4500 }
 ];
-const cancelCursorFollowCallbacks = new Map();
-
-window.addEventListener("touchstart", function (event) {
-    if (event.target.closest("#pageArrows")) return;
-
-    const activeSectionIndex = currentSectionIndex();
-    cancelCursorFollowCallbacks.get(activeSectionIndex)?.();
-}, { passive: true });
 
 const coverNameChars = Array.from(document.querySelectorAll(".cover-name__char"));
 const coverDroneChars = Array.from(document.querySelectorAll(".cover-sub__char"));
@@ -529,56 +518,10 @@ SECTIONS.forEach(function (item) {
         : [];
     if (tags.length) gsap.set(tags, { autoAlpha: 0, y: 12 });
 
-    const sectionIndex = SECTIONS.findIndex(function (entry) {
-        return entry.sel === item.sel;
-    });
     let paragraphIndex = 0;
     let characterIndex = 0;
     let typingComplete = false;
     let typingTimer = null;
-    let cursorFollowFrame = null;
-    let cursorFollowPanel = null;
-    let cursorFollowTarget = 0;
-    let cursorFollowEnabled = true;
-
-    cancelCursorFollowCallbacks.set(sectionIndex, function () {
-        cursorFollowEnabled = false;
-        if (cursorFollowFrame === null) return;
-        window.cancelAnimationFrame(cursorFollowFrame);
-        cursorFollowFrame = null;
-    });
-
-    function followTypingCursor(character) {
-        if (!cursorFollowEnabled || !window.matchMedia("(max-width: 760px)").matches) return;
-
-        const panel = character.closest(".panel");
-        if (!panel) return;
-
-        const panelRect = panel.getBoundingClientRect();
-        const characterRect = character.getBoundingClientRect();
-        cursorFollowPanel = panel;
-        cursorFollowTarget = Math.max(0, Math.min(
-            panel.scrollHeight - panel.clientHeight,
-            panel.scrollTop + characterRect.top + characterRect.height / 2
-                - panelRect.top - panel.clientHeight / 2
-        ));
-
-        if (cursorFollowFrame !== null) return;
-
-        function movePanel() {
-            const distance = cursorFollowTarget - cursorFollowPanel.scrollTop;
-            if (Math.abs(distance) <= 0.5) {
-                cursorFollowPanel.scrollTop = cursorFollowTarget;
-                cursorFollowFrame = null;
-                return;
-            }
-
-            cursorFollowPanel.scrollTop += distance * 0.12;
-            cursorFollowFrame = window.requestAnimationFrame(movePanel);
-        }
-
-        cursorFollowFrame = window.requestAnimationFrame(movePanel);
-    }
 
     function scheduleNextCharacter(delay) {
         typingTimer = window.setTimeout(function () {
@@ -636,7 +579,6 @@ SECTIONS.forEach(function (item) {
         if (characterIndex === 0) current.paragraph.classList.add("is-typing");
         current.paragraph.querySelector(".is-current")?.classList.remove("is-current");
         character.classList.add("is-visible", "is-current");
-        followTypingCursor(character);
         characterIndex += 1;
 
         if (characterIndex < current.characters.length) {
