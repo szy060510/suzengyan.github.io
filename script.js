@@ -236,6 +236,7 @@ if (fstar && eggHint && eggBurst) {
     fstar.style.cursor = "pointer";
     fstar.style.pointerEvents = "auto";
     let eggTriggered = false;
+    let eggHintLastClickAt = -Infinity;
 
     function burstAt(x, y) {
         const impact = document.createElement("span");
@@ -347,6 +348,10 @@ if (fstar && eggHint && eggBurst) {
     }
 
     eggHint.addEventListener("click", function () {
+        const now = Date.now();
+        if (now - eggHintLastClickAt < 2000) return;
+        eggHintLastClickAt = now;
+
         eggTriggered = false;
         fstar.style.opacity = "1";
         fstar.style.transform = "";
@@ -408,6 +413,8 @@ const SECTIONS = [
 ];
 const MOBILE_AUTO_ADVANCE_DELAY = 2500;
 let mobileAutoAdvanceTimer = null;
+let cursorFollowEnabled = true;
+const cancelCursorFollowCallbacks = new Set();
 
 function cancelMobileAutoAdvance() {
     if (mobileAutoAdvanceTimer === null) return;
@@ -427,7 +434,13 @@ function scheduleMobileAutoAdvance(index) {
     }, MOBILE_AUTO_ADVANCE_DELAY);
 }
 
-window.addEventListener("touchstart", cancelMobileAutoAdvance, { passive: true });
+window.addEventListener("touchstart", function () {
+    cancelMobileAutoAdvance();
+    cursorFollowEnabled = false;
+    cancelCursorFollowCallbacks.forEach(function (cancel) {
+        cancel();
+    });
+}, { passive: true });
 window.addEventListener("wheel", cancelMobileAutoAdvance, { passive: true });
 
 const coverNameChars = Array.from(document.querySelectorAll(".cover-name__char"));
@@ -552,8 +565,14 @@ SECTIONS.forEach(function (item) {
     let cursorFollowPanel = null;
     let cursorFollowTarget = 0;
 
+    cancelCursorFollowCallbacks.add(function () {
+        if (cursorFollowFrame === null) return;
+        window.cancelAnimationFrame(cursorFollowFrame);
+        cursorFollowFrame = null;
+    });
+
     function followTypingCursor(character) {
-        if (!window.matchMedia("(max-width: 760px)").matches) return;
+        if (!cursorFollowEnabled || !window.matchMedia("(max-width: 760px)").matches) return;
 
         const panel = character.closest(".panel");
         if (!panel) return;
